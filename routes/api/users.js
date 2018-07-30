@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const DataValidator = require('../../validation/dataValidator');
 
 // Load User model
 const User = require('../../models/User');
@@ -19,12 +20,22 @@ router.get('/', (req, res) => res.json({
 // @desc    register a new user
 // @access  Public
 router.post('/register', (req, res) => {
-  const newUserData = {
+  const dataVal = new DataValidator();
+
+  const UserData = {
     name: req.body.name,
-    password: req.body.password
+    email: req.body.email,
+    password: req.body.password,
+    password2: req.body.password2
+  }
+  
+  if(!dataVal.isDataValid(UserData)){
+    const errors = dataVal.errors;
+    return res.status(400).json(errors);
   }
 
-  const newUser = new User( newUserData )
+  const newUser = new User(UserData)
+
   newUser
     .save()
     .then(
@@ -33,6 +44,7 @@ router.post('/register', (req, res) => {
     .catch(
       err => console.log(err)
     )
+
 })
 
 // @route   Post api/users/login
