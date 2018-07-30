@@ -23,11 +23,11 @@ router.get('/', (req, res) => res.json({
 // @desc    register a new user
 // @access  Public
 router.post('/register', (req, res) => {
-  const dataVal = new DataValidator("register");
-  let errors = {};
-  
-  if(!dataVal.isDataValid(req.body)){
-    const errors = dataVal.errors;
+  const registerVal = new DataValidator("register");
+  let   errors      = {};
+
+  if(!registerVal.isDataValid(req.body)){
+    errors = registerVal.errors;
     return res.status(400).json(errors);
   }
 
@@ -59,13 +59,13 @@ router.post('/register', (req, res) => {
 // @route   Post api/users/login
 // @desc    login a user
 // @access  Public
-router.post('/login', (req, res) => {
-  const dataVal = new DataValidator("login");
-  let errors = {};
+router.post('/login', (req, res) => {  
+  const loginVal = new DataValidator("login");
+  let   errors   = {};
 
   // Check Validation 
-  if(!dataVal.isDataValid(req.body)){
-    const errors = dataVal.errors;
+  if(!loginVal.isDataValid(req.body)){
+    errors = dataVal.errors;
     return res.status(400).json(errors);
   }
   

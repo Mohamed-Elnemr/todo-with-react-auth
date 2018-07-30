@@ -6,43 +6,25 @@ class DataValidator {
   // valType should be either a "login" or "register"
   constructor (valType="login") {
     this.errors = {};
-    this.isValid = false;
     this.valType = valType
   }
 
   // If input data is null or undefined, set it as an empty string as Validator only checks strings
   setData(data) {
-    data.email = !isEmpty(data.email) ? data.email : '';
-    data.password = !isEmpty(data.password) ? data.password : '';
-    
     if ( this.valType === "register") {
       data.name = !isEmpty(data.name) ? data.name : '';
       data.password2 = !isEmpty(data.password2) ? data.password2 : '';
     }
+    data.email = !isEmpty(data.email) ? data.email : '';
+    data.password = !isEmpty(data.password) ? data.password : '';
+    
   }
 
   // Custom errors for input register data
   validateInput(data){
-
-    // Login and Registeration data 
-    if (!Validator.isEmail(data.email)) {
-      this.errors.email = 'Email is invalid';
-    }
-
-    if (Validator.isEmpty(data.email)) {
-      this.errors.email = 'Email field is required';
-    }
-  
-    if (!Validator.isLength(data.password, { min: 6, max: 30 })) {
-      this.errors.password = 'Password must be at least 6 characters';
-    }
-
-    if (Validator.isEmpty(data.password)) {
-      this.errors.password = 'Password field is required';
-    }
-    
     // Registeration data only 
     if ( this.valType === "register") {
+
       if (!Validator.isLength(data.name, { min: 2, max: 30 })) {
         this.errors.name = 'Name must be between 2 and 30 characters';
       }
@@ -58,7 +40,26 @@ class DataValidator {
       if (Validator.isEmpty(data.password2)) {
         this.errors.password2 = 'Confirm Password field is required';
       }
+      
     }
+
+    // Login and Registeration data 
+    if (!Validator.isEmail(data.email)) {
+      this.errors.email = 'Email is invalid';
+    }
+
+    if (Validator.isEmpty(data.email)) {
+      this.errors.email = 'Email field is required';
+    }
+
+    if (!Validator.isLength(data.password, { min: 6, max: 30 })) {
+      this.errors.password = 'Password must be at least 6 characters';
+    }
+
+    if (Validator.isEmpty(data.password)) {
+      this.errors.password = 'Password field is required';
+    }
+    
   }
 
   isDataValid(data){
