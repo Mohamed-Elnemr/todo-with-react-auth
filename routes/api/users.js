@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const keys = require('../../config/keys');
 const DataValidator = require('../../validation/dataValidator');
 
 // Load User model
@@ -21,7 +23,7 @@ router.get('/', (req, res) => res.json({
 // @desc    register a new user
 // @access  Public
 router.post('/register', (req, res) => {
-  const dataVal = new DataValidator();
+  const dataVal = new DataValidator("register");
   let errors = {};
   
   if(!dataVal.isDataValid(req.body)){
@@ -58,19 +60,51 @@ router.post('/register', (req, res) => {
 // @desc    login a user
 // @access  Public
 router.post('/login', (req, res) => {
-    const name = req.body.name
-    const password = req.body.password
+  const dataVal = new DataValidator("login");
+  let errors = {};
 
-  User.findOne({name})
+  // Check Validation 
+  if(!dataVal.isDataValid(req.body)){
+    const errors = dataVal.errors;
+    return res.status(400).json(errors);
+  }
+  
+  // User Login data 
+  const email = req.body.email
+  const password = req.body.password
+
+  // Find user in DB
+  User.findOne({email})
     .then(user =>{
-      // Check for user
+      // Check if email exists
       if (!user) {
         return res.status(404).json('User not found');
       }
       
-      res.json({ user })
+      bcrypt.compare(password, user.password).then(isMatch => {
+        if (isMatch) {
+          // Pass matched with hashed one
+          const payload = { id: user.id, name: user.name }; // Create JWT Payload
+  
+          // Sign Token
+          jwt.sign(
+            payload,
+            keys.secretOrKey,
+            { expiresIn: 3600*24 },
+            (err, token) => {
+              res.json({
+                success: true,
+                token: 'Bearer ' + token
+              });
+            }
+          );
+        } else {
+          errors.password = 'Password incorrect';
+          res.status(400).json(errors);
+        }
+      });
     })
-    .catch(err => res.status(404).json("user is not found"))
+    .catch(err => res.status(400).json("user is not found"))
 });
 
 module.exports = router;
