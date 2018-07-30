@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
-
 const Schema = mongoose.Schema;
 
 const TodoSchema = new Schema({
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: 'users'
+  },
   text: {
     type: String,
     required: true
@@ -12,6 +15,6 @@ const TodoSchema = new Schema({
   },
 });
   
-const Todo = mongoose.model('users', TodoSchema);
+const Todo = mongoose.model('todos', TodoSchema);
 
 module.exports = Todo

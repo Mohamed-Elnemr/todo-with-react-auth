@@ -6,13 +6,40 @@ DataValidator = ( data, valType = "login" ) => {
   let errors = {};
 
   // If input data is null or undefined, set it as an empty string as Validator only checks strings
+  if ( valType === ("register" || "login") ) {
+    data.email = !isEmpty(data.email) ? data.email : '';
+    data.password = !isEmpty(data.password) ? data.password : '';
+  }
+  
   if ( valType === "register") {
     data.name = !isEmpty(data.name) ? data.name : '';
     data.password2 = !isEmpty(data.password2) ? data.password2 : '';
   }
-    data.email = !isEmpty(data.email) ? data.email : '';
-    data.password = !isEmpty(data.password) ? data.password : '';
 
+  if (valType === "todo") {
+    data.text = !isEmpty(data.text) ? data.text : '';
+  }
+
+  // Login and Registeration data 
+  if ( valType === ("register" || "login") ) {
+
+    if (!Validator.isEmail(data.email)) {
+      errors.email = 'Email is invalid';
+    }
+
+    if (Validator.isEmpty(data.email)) {
+      errors.email = 'Email field is required';
+    }
+
+    if (!Validator.isLength(data.password, { min: 6, max: 30 })) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+
+    if (Validator.isEmpty(data.password)) {
+      errors.password = 'Password field is required';
+    }
+
+  }
   // Registeration data only 
   if ( valType === "register") {
 
@@ -33,22 +60,19 @@ DataValidator = ( data, valType = "login" ) => {
     }
 
   }
-    // Login and Registeration data 
-    if (!Validator.isEmail(data.email)) {
-      errors.email = 'Email is invalid';
+
+  // Todo creation data only 
+  if ( valType === "todo") {
+
+    if (!Validator.isLength(data.text, { min: 2, max: 100 })) {
+      errors.text = 'text must be between 2 and 100 characters';
     }
 
-    if (Validator.isEmpty(data.email)) {
-      errors.email = 'Email field is required';
+    if (Validator.isEmpty(data.text)) {
+      errors.text = 'text field is required';
     }
 
-    if (!Validator.isLength(data.password, { min: 6, max: 30 })) {
-      errors.password = 'Password must be at least 6 characters';
-    }
-
-    if (Validator.isEmpty(data.password)) {
-      errors.password = 'Password field is required';
-    }
+  }
 
   return {
     errors,

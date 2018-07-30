@@ -11,6 +11,7 @@ const User = require('../../models/User');
 // Load Input data Validator
 const DataValidator = require('../../validation/dataValidator');
 
+//______________________________________________________________________________________________________________
 // @route   GET api/users/
 // @desc    Get Current User
 // @access  Private
@@ -21,6 +22,7 @@ router.get('/', jwtMidware, (req, res) => res.json({
   })
 );
 
+//______________________________________________________________________________________________________________
 // @route   Post api/users/register
 // @desc    register a new user
 // @access  Public
@@ -57,6 +59,7 @@ router.post('/register', (req, res) => {
   })
 });
 
+//______________________________________________________________________________________________________________
 // @route   Post api/users/login
 // @desc    login a user
 // @access  Public
