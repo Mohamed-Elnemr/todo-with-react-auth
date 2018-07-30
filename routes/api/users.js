@@ -3,10 +3,12 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys');
-const DataValidator = require('../../validation/dataValidator');
 
 // Load User model
 const User = require('../../models/User');
+
+// Load Input data Validator
+const DataValidator = require('../../validation/dataValidator');
 
 // ******** NEEDS A MIDDLEWARE
 // @route   GET api/users/
@@ -23,11 +25,10 @@ router.get('/', (req, res) => res.json({
 // @desc    register a new user
 // @access  Public
 router.post('/register', (req, res) => {
-  const registerVal = new DataValidator("register");
-  let   errors      = {};
+  const { errors, isValid } = DataValidator(req.body, "register");
 
-  if(!registerVal.isDataValid(req.body)){
-    errors = registerVal.errors;
+  // Check Validation 
+  if (!isValid) {
     return res.status(400).json(errors);
   }
 
@@ -60,12 +61,10 @@ router.post('/register', (req, res) => {
 // @desc    login a user
 // @access  Public
 router.post('/login', (req, res) => {  
-  const loginVal = new DataValidator("login");
-  let   errors   = {};
+  const { errors, isValid } = DataValidator(req.body);
 
   // Check Validation 
-  if(!loginVal.isDataValid(req.body)){
-    errors = dataVal.errors;
+  if (!isValid) {
     return res.status(400).json(errors);
   }
   
