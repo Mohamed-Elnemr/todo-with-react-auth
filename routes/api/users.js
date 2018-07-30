@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys');
+const jwtMidware = require("../../middleware/jwtMidware");
 
 // Load User model
 const User = require('../../models/User');
@@ -10,14 +11,13 @@ const User = require('../../models/User');
 // Load Input data Validator
 const DataValidator = require('../../validation/dataValidator');
 
-// ******** NEEDS A MIDDLEWARE
 // @route   GET api/users/
 // @desc    Get Current User
 // @access  Private
-router.get('/', (req, res) => res.json({
+router.get('/', jwtMidware, (req, res) => res.json({
     id: req.user.id,
     name: req.user.name,
-    password: req.user.password
+    email: req.user.email
   })
 );
 
