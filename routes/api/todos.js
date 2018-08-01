@@ -24,14 +24,14 @@ router.post("/", jwtMidware, (req,res)=>{
 
   newTodo
     .save()
-    .then((todo)=>{
-        res.json(todo)
-    })
+    .then( (todo)=>{res.json(todo)} )
+    .catch( (err)=>{res.status(404).json(err)} );
+    
 })
 
 //______________________________________________________________________________________________________________
-// @route   GET api/profile
-// @desc    GET current Uesr todos
+// @route   GET api/todos
+// @desc    GET current User todos
 // @access  Private
 router.get('/', jwtMidware,  (req, res) => {
   let errors = {};
@@ -46,7 +46,7 @@ router.get('/', jwtMidware,  (req, res) => {
 
      res.json(todos);
   })
-  .catch((err)=>{res.status(404).json(err)});
+  .catch( (err)=>{res.status(404).json(err)} );
 
 });
 
