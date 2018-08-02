@@ -57,6 +57,7 @@ class Login extends Component {
                     className='form-control form-control-lg'
                     value={this.state.email}
                     onChange={this.onChange} 
+                    error={this.state.errors.name}
                   />
                 </div>
                 <div className="form-group">
@@ -67,6 +68,7 @@ class Login extends Component {
                     className='form-control form-control-lg'
                     value={this.state.password}
                     onChange={this.onChange} 
+                    error={this.state.errors.password}
                   />
                 </div>
                 <input type="submit" className="btn btn-info btn-block mt-4" />
