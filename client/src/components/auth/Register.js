@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import TextInputCell from "./reusable/TextInputCell"
 
 class Register extends Component {
   constructor(props) {
@@ -48,6 +49,7 @@ class Register extends Component {
   }
 
   render() {
+    const { errors } = this.state;
     return (
       <div className="register">
         <div className="container">
@@ -57,51 +59,39 @@ class Register extends Component {
               <p className="lead text-center">
                 Create your account
               </p>
-              <form noValidate onSubmit={this.onSubmit} >
-                <div className="form-group">
-                  <input
-                    type="text"
-                    placeholder="Name"
-                    name="name"
-                    className='form-control form-control-lg'
-                    value={this.state.name} 
-                    onChange={this.onChange}
-                    error={this.state.errors.name}
-                  />
-                </div>
-                <div className="form-group">
-                  <input
-                    type="email"
-                    placeholder="Email Address"
-                    name="email"
-                    className='form-control form-control-lg'
-                    value={this.state.email} 
-                    onChange={this.onChange}
-                    error={this.state.errors.email}
-                  />
-                </div>
-                <div className="form-group">
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    name="password"
-                    className='form-control form-control-lg'
-                    value={this.state.password} 
-                    onChange={this.onChange}
-                    error={this.state.errors.password}
-                  />
-                </div>
-                <div className="form-group">
-                  <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    name="password2"
-                    className='form-control form-control-lg'
-                    value={this.state.password2} 
-                    onChange={this.onChange}
-                    error={this.state.errors.password2}
-                  />
-                </div>
+              <form noValidate onSubmit={this.onSubmit}>
+                <TextInputCell 
+                  type="text" 
+                  placeholder="Name" 
+                  name="name" 
+                  value={this.state.name} 
+                  onChange={this.onChange} 
+                  error={errors.name}
+                />
+                <TextInputCell 
+                  type="email" 
+                  placeholder="Email Address" 
+                  name="email" 
+                  value={this.state.email} 
+                  onChange={this.onChange} 
+                  error={errors.email}
+                />
+                <TextInputCell 
+                  type="password" 
+                  placeholder="Password" 
+                  name="password" 
+                  value={this.state.password} 
+                  onChange={this.onChange} 
+                  error={errors.password}
+                />
+                <TextInputCell 
+                  type="password" 
+                  placeholder="Password" 
+                  name="password2" 
+                  value={this.state.password2} 
+                  onChange={this.onChange} 
+                  error={errors.password2}
+                />
                 <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>
             </div>

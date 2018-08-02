@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import TextInputCell from "./reusable/TextInputCell"
 
 class Login extends Component {
   constructor(props) {
@@ -39,6 +40,7 @@ class Login extends Component {
   }
   
   render() {
+    const { errors } = this.state;
     return (
       <div className="login">
         <div className="container">
@@ -48,29 +50,26 @@ class Login extends Component {
               <p className="lead text-center">
                 Sign in to your account
               </p>
-              <form noValidate onSubmit={this.onSubmit} >
-                <div className="form-group">
-                  <input
-                    type="email"
-                    placeholder="Email Address"
-                    name="email"
-                    className='form-control form-control-lg'
-                    value={this.state.email}
+              <form noValidate onSubmit={this.onSubmit}>
+                  <TextInputCell 
+                    type="email" 
+                    placeholder="Email Address" 
+                    name="email" 
+                    value={this.state.email} 
                     onChange={this.onChange} 
-                    error={this.state.errors.name}
+                    error={errors.email || errors.password}
+                    HighlightFieldOnError = {false}
                   />
-                </div>
-                <div className="form-group">
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    name="password"
-                    className='form-control form-control-lg'
-                    value={this.state.password}
-                    onChange={this.onChange} 
-                    error={this.state.errors.password}
-                  />
-                </div>
+                  <TextInputCell 
+                  type="password" 
+                  placeholder="Password" 
+                  name="password" 
+                  value={this.state.password} 
+                  onChange={this.onChange} 
+                  error={errors.email || errors.password}
+                  HighlightFieldOnError = {true}
+                  customErrorMsg = "Email or Password is incorrect"
+                />
                 <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>
             </div>
