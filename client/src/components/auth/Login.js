@@ -33,12 +33,21 @@ class Login extends Component {
         // Get token from the response then set it to localStorage
         const token = res.data.token
         localStorage.setItem('token', token);
+        // Send token to authOnLogin and Redirect
+        this.props.authOnLogin(token)
+        this.props.history.push('/')
       })
       .catch( err => 
         this.setState({ errors: err.response.data })
       );
   }
-  
+
+  componentWillMount() {
+    if (this.props.isAuthen === true) {
+      this.props.history.push('/');
+    }
+  }
+
   render() {
     const { errors } = this.state;
     return (
