@@ -43,7 +43,7 @@ class App extends Component {
     return (
       <Router>
         <div className="App">
-          <Navbar />
+          <Navbar isAuthen={this.state.isAuthen} logoutUser={this.logoutUser}/>
           <Route 
             exact path="/" 
             render={

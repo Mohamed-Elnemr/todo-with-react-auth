@@ -3,6 +3,23 @@ import { Link } from 'react-router-dom';
 
 class Landing extends Component {
   render() {
+    const authLinks = (
+      <span>
+        <Link to="/register" className="btn btn-lg btn-info mr-2">
+          Sign Up
+          </Link>
+          <Link to="/login" className="btn btn-lg btn-light">
+          Login
+        </Link>
+      </span>
+    )
+    const guestLinks = (
+      <span>
+        <Link to="/myApp" className="btn btn-lg btn-info mr-2">
+          Go to the App
+          </Link>
+      </span>
+    )
     return (
       <div className="landing">
         <div className="dark-overlay landing-inner text-dark">
@@ -14,14 +31,7 @@ class Landing extends Component {
                   A MERN: (Mongodb, Express, React and Nodejs) stack Todo application with JWT authentication system 
                 </p>
                 <hr />
-                <span>
-                  <Link to="/register" className="btn btn-lg btn-info mr-2">
-                    Sign Up
-                    </Link>
-                    <Link to="/login" className="btn btn-lg btn-light">
-                    Login
-                  </Link>
-                </span>
+                {this.props.isAuthen === false ? authLinks: guestLinks}
               </div>
             </div>
           </div>
