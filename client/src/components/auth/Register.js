@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import {registerAction} from "./actions/authActions"
 import TextInputCell from "./reusable/TextInputCell"
 
 class Register extends Component {
@@ -15,6 +15,17 @@ class Register extends Component {
     };
     this.onChange           = this.onChange.bind(this);
     this.onSubmit           = this.onSubmit.bind(this);
+    this.setStateWithErrors = this.setStateWithErrors.bind(this);
+  }
+
+  setStateWithErrors(errors){
+    this.setState({ errors })
+  }
+
+  componentWillMount() {
+    if (this.props.isAuthen === true) {
+      this.props.history.push('/');
+    }
   }
 
   onChange(e) {
@@ -31,30 +42,12 @@ class Register extends Component {
       password2: this.state.password2
     };
 
-    axios
-    .post('/api/users/register', newUser)
-    .then( () =>
-        axios
-        .post ( "/api/users/login", newUser)
-        .then( res => {
-          // Get token from the response then set it to localStorage
-          const token = res.data.token
-          localStorage.setItem('token', token);
-          // Send token to authOnLogin and Redirect
-          this.props.authOnLogin(token)
-          this.props.history.push('/')
-        })
-        .catch( err => 
-          this.setState({ errors: err.response.data })
-        )
+    registerAction(
+      newUser, 
+      this.props.history, 
+      this.props.authOnLogin, 
+      this.setStateWithErrors
     )
-    .catch( err => this.setState({ errors:err.response.data }))
-  }
-
-  componentWillMount() {
-    if (this.props.isAuthen === true) {
-      this.props.history.push('/');
-    }
   }
 
   render() {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import {loginAction} from "./actions/authActions"
 import TextInputCell from "./reusable/TextInputCell"
 
 class Login extends Component {
@@ -13,6 +13,11 @@ class Login extends Component {
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.setStateWithErrors = this.setStateWithErrors.bind(this);
+  }
+
+  setStateWithErrors(errors){
+    this.setState({ errors })
   }
 
   onChange(e) {
@@ -26,22 +31,15 @@ class Login extends Component {
       email: this.state.email,
       password: this.state.password
     };
-
-    axios
-      .post ( "/api/users/login", user)
-      .then( res => {
-        // Get token from the response then set it to localStorage
-        const token = res.data.token
-        localStorage.setItem('token', token);
-        // Send token to authOnLogin and Redirect
-        this.props.authOnLogin(token)
-        this.props.history.push('/')
-      })
-      .catch( err => 
-        this.setState({ errors: err.response.data })
-      );
+    // Fire login action
+    loginAction(
+      user, 
+      this.props.history, 
+      this.props.authOnLogin, 
+      this.setStateWithErrors
+    )
   }
-
+  
   componentWillMount() {
     if (this.props.isAuthen === true) {
       this.props.history.push('/');
