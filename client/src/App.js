@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-
+import { BrowserRouter as Router} from 'react-router-dom';
+import {PublicRoute, PrivateRoute} from "./router/RouterComponents";
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-
-import MyTodos from './components/private/MyTodos';
 import Landing from './components/layout/Landing';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
-
+import MyTodos from './components/private/MyTodos';
 import axios from 'axios';
-
 import './App.css';
 
 class App extends Component {
@@ -27,55 +24,36 @@ class App extends Component {
     }
     this.authOnLogin = this.authOnLogin.bind(this)
     this.logoutUser  = this.logoutUser.bind(this)
-}
+  }
 
   //set authorization header and state
   authOnLogin(token) {
-  this.setState( {isAuthen:true, token:token} )
-  axios.defaults.headers.common['Authorization'] = token 
+   this.setState( {isAuthen:true, token:token} )
+   axios.defaults.headers.common['Authorization'] = token 
   }
 
   logoutUser(){
-  this.setState( {isAuthen:false, token: null} )
-  axios.defaults.headers.common['Authorization'] = null
-  localStorage.removeItem('token')
+    this.setState( {isAuthen:false, token: null} )
+    axios.defaults.headers.common['Authorization'] = null
+    localStorage.removeItem('token')
   }
 
   render() {
     return (
       <Router>
         <div className="App">
-          <Navbar isAuthen={this.state.isAuthen} logoutUser={this.logoutUser}/>
-          <Route 
-            exact path="/myApp"
-            render={
-                    (props) => <MyTodos {...props} isAuthen={this.state.isAuthen}/>
-                  }
-          />
-          <Route 
-            exact path="/" 
-            render={
-                    (props) => <Landing {...props} isAuthen={this.state.isAuthen}/>
-                  }
-            />
-            <Route 
-            exact path="/login" 
-            render={
-                    (props) => <Login {...props} authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
-                  }
-            />
-            <Route 
-            exact path="/register" 
-            render={
-                    (props) => <Register {...props} authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
-                  }
-            />
-          <Footer />
+        <Navbar isAuthen={this.state.isAuthen} logoutUser={this.logoutUser} />
+        <div className="container" style={{minHeight:"380px", marginTop:"60px"}}>
+          <PrivateRoute component={MyTodos} exact path='/myApp' isAuthen={this.state.isAuthen}  />
+          <PublicRoute component={Landing} exact path='/' isAuthen={this.state.isAuthen}/>
+          <PublicRoute component={Register} exact path='/register' authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
+          <PublicRoute component={Login} exact path='/login' authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
+        </div>
+        <Footer  />
         </div>
       </Router>
     );
   }
 }
-
 
 export default App;
