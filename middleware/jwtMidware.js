@@ -1,4 +1,4 @@
-const secretOrKey            = require("../config/keys").secretOrKey;
+const jwtSecret            = require("../config/keys").jwtSecret;
 const extractTokenFromHeader = require("./utils/extractTokenFromHeader")
 const jwt                    = require('jsonwebtoken');
 const User                   = require('../models/User');
@@ -9,7 +9,7 @@ jwtMidware = function (req,res,next) {
   return !token ? res.status(401).send("Unauthorized, no token"):
 
   // Verify the token and set user id
-  jwt.verify(token, secretOrKey, (err, decoded) => {
+  jwt.verify(token, jwtSecret, (err, decoded) => {
     return err ? res.status(401).send("Unauthorized, bad token"):
       // Find user with the decoded id in token then set header
       User.findById(decoded.id) 

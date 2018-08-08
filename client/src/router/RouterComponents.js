@@ -17,15 +17,3 @@ export const PublicRoute = ({component: Component, path, ...rest}) =>
       (props) => <Component {...props} {...rest} />
     }
   />
-
-/* 
-  <Route 
-    exact path="/login"
-    render={
-      (props) => <Login {...props} authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
-    }
-  />
-
-  <PublicRoute component={Login} exact path='/login' authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
-
-*/
