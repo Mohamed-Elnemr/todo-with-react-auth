@@ -8,7 +8,7 @@ import classnames from 'classnames';
   error,
   type,
   onChange,
-  HighlightFieldOnError = true,
+  showError = true,
   customErrorMsg
 }) => (
     <div className="form-group">
@@ -22,7 +22,7 @@ import classnames from 'classnames';
         value={value}
         onChange={onChange}
       />
-      {HighlightFieldOnError && error && (
+      {showError && error && (
         <div className="invalid-feedback">{customErrorMsg || error}</div>
       )}
     </div>

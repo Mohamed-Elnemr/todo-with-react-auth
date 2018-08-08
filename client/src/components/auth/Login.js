@@ -31,6 +31,7 @@ class Login extends Component {
       email: this.state.email,
       password: this.state.password
     };
+
     // Fire login action
     loginAction(
       user, 
@@ -65,7 +66,7 @@ class Login extends Component {
                     value={this.state.email} 
                     onChange={this.onChange} 
                     error={errors.email || errors.password}
-                    HighlightFieldOnError = {false}
+                    showError = {false}
                   />
                   <TextInputCell 
                   type="password" 
@@ -74,7 +75,7 @@ class Login extends Component {
                   value={this.state.password} 
                   onChange={this.onChange} 
                   error={errors.email || errors.password}
-                  HighlightFieldOnError = {true}
+                  showError = {true}
                   customErrorMsg = "Email or Password is incorrect"
                 />
                 <input type="submit" className="btn btn-info btn-block mt-4" />

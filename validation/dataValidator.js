@@ -6,7 +6,7 @@ DataValidator = ( data, valType = "login" ) => {
   let errors = {};
 
   // If input data is null or undefined, set it as an empty string as Validator only checks strings
-  if ( valType === ("register" || "login") ) {
+  if ( valType === "register" || valType === "login" ) {
     data.email = !isEmpty(data.email) ? data.email : '';
     data.password = !isEmpty(data.password) ? data.password : '';
   }
@@ -21,7 +21,7 @@ DataValidator = ( data, valType = "login" ) => {
   }
 
   // Login and Registeration data 
-  if ( valType === ("register" || "login") ) {
+  if ( valType === "register" || valType === "login" ) {
 
     if (!Validator.isEmail(data.email)) {
       errors.email = 'Email is invalid';
