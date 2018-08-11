@@ -64,8 +64,8 @@ DataValidator = ( data, valType = "login" ) => {
   // Todo creation data only 
   if ( valType === "todo") {
 
-    if (!Validator.isLength(data.text, { min: 2, max: 100 })) {
-      errors.text = 'text must be between 2 and 100 characters';
+    if (!Validator.isLength(data.text, { min: 1, max: 100 })) {
+      errors.text = 'text must be between 1 and 100 characters';
     }
 
     if (Validator.isEmpty(data.text)) {

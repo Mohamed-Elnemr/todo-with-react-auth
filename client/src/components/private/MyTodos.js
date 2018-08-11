@@ -3,7 +3,7 @@ import {fetchTodos, addNewTodo, deleteTodo} from "./todoActions"
 
   //1) For a better client side performance we set the state twice, before and after
   //   sending actions to DB to get rid of the DB delay between request and response 
-  //2) State todos takes this form [ [todo1_text, todo2_index], [todo1_text, todo2_index]... ] 
+  //2) State todos takes this form [ [todo1_text, todo1_index], [todo2_text, todo2_index]... ] 
 
 class MyTodos extends Component {
   constructor(props) {
@@ -21,16 +21,21 @@ class MyTodos extends Component {
   }
 
   replaceStateUnValidatedTodoWithDbOne(DbTodo){
+    // Find the unval todo by text then remove it
     let allTodos = this.state.todos
-    allTodos.pop()
+    allTodos.splice(
+      allTodos.findIndex(
+        text => text == DbTodo[0]
+      ), 1
+    )
+    // Set state with the validated one
     this.setState({ 
-      text:"",
       todos: [...allTodos, DbTodo] 
     })
   }
 
   setStateWithTodosFromInputField(){
-    const InputFieldTodo  = [ this.state.text, {} ]
+    const InputFieldTodo  = [ this.state.text]
     this.setState({ 
       text:"",
       todos: [...this.state.todos, InputFieldTodo] 
@@ -47,9 +52,9 @@ class MyTodos extends Component {
     if(this.state.text){
       const unValTodo = { text: this.state.text }
       this.setStateWithTodosFromInputField()
-      addNewTodo(unValTodo).then( TodoFromDb => {
-        this.replaceStateUnValidatedTodoWithDbOne(TodoFromDb)
-      })
+        addNewTodo(unValTodo)
+        .then( TodoFromDb => this.replaceStateUnValidatedTodoWithDbOne(TodoFromDb)
+        )
     }
   }
 
@@ -68,39 +73,44 @@ class MyTodos extends Component {
   }
   
   componentWillMount(){
-    // Check if user is logged in
-    if (this.props.isAuthen === true) {
-      // Fetch user's todos then set State
-      fetchTodos().then( (todos)=>{
-        this.setState({ todos: todos })
-      })
+    // Fetch user's todos then set State if valid
+    this.props.isAuthen && !this.props.isTokenExpired() ?
+      fetchTodos()
+        .then( todos => 
+          this.setState({ todos: todos })
+      ):this.props.logoutUser()
+  }
+
+  componentWillUpdate(){
+    if (this.props.isTokenExpired()){
+      this.props.logoutUser()
     }
   }
 
   render() {
+    console.log(this.state.todos)
     const renderTodoCells = (
-      this.state.todos.length > 0 ?
-        this.state.todos.map((todo, index)=>{
-          let todoText = todo[0]
-          let todoId   = todo[1]
-          return (
-            <tr key={ todoId } >
-              <td > 
-                { index + 1 } 
-              </td>
-              <td > 
-                { todoText } 
-              </td>
-              <td >
-                <button type="button" value={index + "," + todoId}  className="btn btn-danger" onClick={this.onDeleteSubmit} style={{fontSize:"12px",padding:"0" ,height:"20px", width:"20px"}}>
-                  &#x2718; 
-                </button> 
-              </td>
-            </tr>
-          )
-        }):null
-      )
-
+      this.state.todos.map((todo, index)=>{
+        let todoText = todo[0]
+        let todoId   = todo[1]
+        return (
+          <tr key={ Math.ceil(Math.random()*10000000) } >
+            <td> 
+              { index + 1 } 
+            </td>
+            <td> 
+              { todoText } 
+            </td>
+            <td>
+              <button type="button" value={index + "," + todoId}  className="btn btn-danger" onClick={this.onDeleteSubmit} style={{fontSize:"12px",padding:"0" ,height:"20px", width:"20px"}}>
+                &#x2718; 
+              </button> 
+            </td>
+          </tr>
+        )
+      })
+    )
+  
     return (
       <div>
         <form onSubmit={this.onAddSubmit} >
@@ -113,22 +123,22 @@ class MyTodos extends Component {
               </tr>
             </thead>
             <tbody>
-              {renderTodoCells}
+              {this.props.isAuthen ? renderTodoCells:<h1>sdfsdf</h1>}
               <tr className="bg-info" >
-                  <td></td>
-                  <td >
-                    <input 
-                      type="text" 
-                      name="text" 
-                      onChange={this.onChange} 
-                      value={this.state.text} 
-                      className="form-control border-0 text-center " 
-                      placeholder="New Todo"
-                    />
-                  </td>
-                  <td>
-                    <button type="submit" className="btn btn-success">Add Todo</button>
-                  </td>
+                <td></td>
+                <td >
+                  <input 
+                    type="text" 
+                    name="text" 
+                    onChange={this.onChange} 
+                    value={this.state.text} 
+                    className="form-control border-0 text-center " 
+                    placeholder="New Todo"
+                  />
+                </td>
+                <td>
+                  <button type="submit" className="btn btn-success">Add Todo</button>
+                </td>
               </tr>
             </tbody>
           </table>
