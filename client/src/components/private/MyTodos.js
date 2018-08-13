@@ -3,7 +3,7 @@ import {fetchTodos, addNewTodo, deleteTodo} from "./todoActions"
 
   //1) For a better client side performance we set the state twice, before and after
   //   sending actions to DB to get rid of the DB delay between request and response 
-  //2) State todos takes this form [ [todo1_text, todo1_index], [todo2_text, todo2_index]... ] 
+  //2) State db todos takes this form [ [todo1_text, todo1_index], [todo2_text, todo2_index]... ] 
 
 class MyTodos extends Component {
   constructor(props) {
@@ -21,20 +21,20 @@ class MyTodos extends Component {
   }
 
   replaceStateUnValidatedTodoWithDbOne(DbTodo){
-    // Find the unval todo by text then remove it
+    // Find the unval todo index by text
     let allTodos = this.state.todos
-    allTodos.splice(
-      allTodos.findIndex(
-        text => text == DbTodo[0]
-      ), 1
+    const index = allTodos.findIndex( 
+      text => text == DbTodo[0]
     )
-    // Set state with the validated one
+    // Replace it then Set state with validated one
+    allTodos[index] = DbTodo
     this.setState({ 
-      todos: [...allTodos, DbTodo] 
+      todos: [...allTodos] 
     })
   }
 
   setStateWithTodosFromInputField(){
+    // Temporarily set todos state with text only (no id)
     const InputFieldTodo  = [ this.state.text]
     this.setState({ 
       text:"",
@@ -88,7 +88,6 @@ class MyTodos extends Component {
   }
 
   render() {
-    console.log(this.state.todos)
     const renderTodoCells = (
       this.state.todos.map((todo, index)=>{
         let todoText = todo[0]
