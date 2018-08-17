@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import {registerAction} from "./actions/authActions"
+import { connect } from 'react-redux';
 import TextInputCell from "./reusable/TextInputCell"
+import { registerUser } from '../../actions/authActionCreators';
 
 class Register extends Component {
   constructor(props) {
@@ -11,21 +12,9 @@ class Register extends Component {
       password: '',
       password2: '',
       errors: {},
-      isAuthen: this.props.isAuthen
     };
     this.onChange           = this.onChange.bind(this);
     this.onSubmit           = this.onSubmit.bind(this);
-    this.setStateWithErrors = this.setStateWithErrors.bind(this);
-  }
-
-  setStateWithErrors(errors){
-    this.setState({ errors })
-  }
-
-  componentWillMount() {
-    if (this.props.isAuthen === true) {
-      this.props.history.push('/');
-    }
   }
 
   onChange(e) {
@@ -35,19 +24,30 @@ class Register extends Component {
   onSubmit(e) {
     e.preventDefault();
 
-    const newUser = {
+    const userData = {
       name: this.state.name,
       email: this.state.email,
       password: this.state.password,
       password2: this.state.password2
     };
+    // Fire register action
+    this.props.registerUser(userData)
+  }
 
-    registerAction(
-      newUser, 
-      this.props.history, 
-      this.props.authOnLogin, 
-      this.setStateWithErrors
-    )
+  componentDidMount() {
+    if (this.props.auth.isAuthen) {
+      this.props.history.push('/');
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.auth.isAuthen) {
+      this.props.history.push('/');
+    }
+
+    if (nextProps.errors) {
+      this.setState({ errors: nextProps.errors });
+    }
   }
 
   render() {
@@ -104,4 +104,9 @@ class Register extends Component {
   }
 }
 
-export default Register;
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+export default connect(mapStateToProps, { registerUser })(Register);

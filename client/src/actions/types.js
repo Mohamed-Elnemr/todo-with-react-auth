@@ -1,0 +1,3 @@
+export const SET_AUTH_STATUS = 'SET_AUTH_STATUS';
+export const SET_ERRORS = 'SET_ERRORS';
+export const REST_AUTH_STATUS = 'REST_AUTH_STATUS';

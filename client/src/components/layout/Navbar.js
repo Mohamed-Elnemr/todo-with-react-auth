@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import {logoutUser} from '../../actions/authActionCreators'
 
 class Navbar extends Component {
-  onLogoutClick() {
-    this.props.logoutUser();
+  onLogoutClick(e) {
+    e.preventDefault();
+    this.props.logoutUser()
   }
 
   render() {
@@ -46,7 +49,7 @@ class Navbar extends Component {
           </button>
 
           <div className="collapse navbar-collapse" id="mobile-nav">
-            {this.props.isAuthen === false ? guestLinks:authLinks}
+            {this.props.auth.isAuthen === false ? guestLinks:authLinks}
           </div>
         </div>
       </nav>
@@ -54,4 +57,8 @@ class Navbar extends Component {
   }
 }
 
-export default Navbar;
+const mapStateToProps = state => ({
+  auth: state.auth
+});
+
+export default connect(mapStateToProps, { logoutUser} )(Navbar);

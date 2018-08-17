@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router} from 'react-router-dom';
+import { Provider } from 'react-redux';
+import store from './store';
+
 import {PublicRoute, PrivateRoute} from "./router/RouterComponents";
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -7,35 +10,61 @@ import Landing from './components/layout/Landing';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
 import MyTodos from './components/private/MyTodos';
-import jwtDecode from "jwt-decode"
+
+import { setToken } from './actions/authActions';
+import { logoutUser } from './actions/authActionCreators';
+import validateToken from './utils/validateToken';
+
 import axios from 'axios';
 import './App.css';
 
 class App extends Component {
   constructor() {
     super()
-    // get token from local storage
+    // Get token from local storage
     const token = localStorage.getItem('token')
-    //set authorization header and initialize state
-    if (token && !this.isTokenExpired()) {
-      axios.defaults.headers.common['Authorization'] = token 
-      this.state = { isAuthen: true, token: token }
+    // Get validation results
+    const { isTokenVal, decoded} = validateToken(token)
+    
+    if( isTokenVal ){
+      // Set auth header
+      axios.defaults.headers.common['Authorization'] = token
+      // Set store with token data
+      store.dispatch(setToken(decoded))
+
     } else {
-      this.state = { isAuthen : false, token : null }
-    }
-    this.isTokenExpired  = this.isTokenExpired.bind(this)
-    this.authOnLogin     = this.authOnLogin.bind(this)
-    this.logoutUser      = this.logoutUser.bind(this)
+      // Remove auth header and remove token
+      axios.defaults.headers.common['Authorization'] = ""
+      // Set store status
+      store.dispatch(logoutUser())
+      // Remove token from local storage
+      localStorage.removeItem('token')
+    }    
   }
 
-  isTokenExpired(){
-    const token = localStorage.getItem('token')
-    const decoded = jwtDecode(token);
-    const currentTime = Date.now() / 1000;
-    return decoded.exp < currentTime ? true : false
+  render() {
+    return (
+      <Provider store={store}>
+        <Router>
+          <div className="App">
+          <Navbar/>
+          <div className="container" style={{minHeight:"380px", marginTop:"60px"}}>
+            <PrivateRoute component={MyTodos} exact path="/myapp"/>
+            <PublicRoute component={Landing} exact path="/"/>
+            <PublicRoute component={Register} exact path="/register"/>
+            <PublicRoute component={Login} exact path="/login"/>
+          </div>
+          <Footer/>
+          </div>
+        </Router>
+      </Provider>
+    );
   }
+}
 
-  //set authorization header and state
+export default App;
+
+/*   //set authorization header and state
   authOnLogin(token) {
    this.setState( {isAuthen:true, token:token} )
    axios.defaults.headers.common['Authorization'] = token 
@@ -45,24 +74,11 @@ class App extends Component {
     this.setState( {isAuthen:false, token: null} )
     axios.defaults.headers.common['Authorization'] = null
     localStorage.removeItem('token')
-  }
-  
-  render() {
-    return (
-      <Router>
-        <div className="App">
-        <Navbar isAuthen={this.state.isAuthen} logoutUser={this.logoutUser} />
-        <div className="container" style={{minHeight:"380px", marginTop:"60px"}}>
-          <PrivateRoute component={MyTodos} exact path='/myApp' isAuthen={this.state.isAuthen} logoutUser={this.logoutUser} isTokenExpired={this.isTokenExpired} />
-          <PublicRoute component={Landing} exact path='/' isAuthen={this.state.isAuthen}/>
-          <PublicRoute component={Register} exact path='/register' authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
-          <PublicRoute component={Login} exact path='/login' authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
-        </div>
-        <Footer  />
-        </div>
-      </Router>
-    );
-  }
-}
-
-export default App;
+  } */
+  /* 
+  <Navbar isAuthen={this.state.isAuthen} logoutUser={this.logoutUser} />
+    <PrivateRoute component={MyTodos} exact path='/myApp' isAuthen={this.state.isAuthen} logoutUser={this.logoutUser} isTokenExpired={this.isTokenExpired} />
+    <PublicRoute component={Landing} exact path='/' isAuthen={this.state.isAuthen}/>
+    <PublicRoute component={Register} exact path='/register' authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
+    <PublicRoute component={Login} exact path='/login' authOnLogin={this.authOnLogin} isAuthen={this.state.isAuthen}/>
+  */

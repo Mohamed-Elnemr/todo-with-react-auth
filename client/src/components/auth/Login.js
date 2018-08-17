@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import {loginAction} from "./actions/authActions"
+import { connect } from 'react-redux';
 import TextInputCell from "./reusable/TextInputCell"
+import { loginUser } from '../../actions/authActionCreators';
 
 class Login extends Component {
   constructor(props) {
@@ -8,16 +9,10 @@ class Login extends Component {
     this.state = {
       email: '',
       password: '',
-      errors: {},
-      isAuthen: this.props.isAuthen
+      errors: {}
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-    this.setStateWithErrors = this.setStateWithErrors.bind(this);
-  }
-
-  setStateWithErrors(errors){
-    this.setState({ errors })
   }
 
   onChange(e) {
@@ -27,23 +22,27 @@ class Login extends Component {
   onSubmit(e) {
     e.preventDefault();
     // User data
-    const user = {
+    const userData = {
       email: this.state.email,
       password: this.state.password
     };
-
     // Fire login action
-    loginAction(
-      user, 
-      this.props.history, 
-      this.props.authOnLogin, 
-      this.setStateWithErrors
-    )
+    this.props.loginUser(userData)
   }
-  
-  componentWillMount() {
-    if (this.props.isAuthen === true) {
+
+  componentDidMount() {
+    if (this.props.auth.isAuthen) {
       this.props.history.push('/');
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.auth.isAuthen) {
+      this.props.history.push('/');
+    }
+
+    if (nextProps.errors) {
+      this.setState({ errors: nextProps.errors });
     }
   }
 
@@ -88,4 +87,9 @@ class Login extends Component {
   }
 }
 
-export default Login;
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+export default connect(mapStateToProps, { loginUser })(Login);

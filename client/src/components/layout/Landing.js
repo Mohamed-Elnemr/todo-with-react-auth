@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 class Landing extends Component {
   render() {
@@ -31,7 +32,7 @@ class Landing extends Component {
                   A MERN: (Mongodb, Express, React and Nodejs) stack Todo application with JWT authentication system 
                 </p>
                 <hr />
-                {this.props.isAuthen === false ? authLinks: guestLinks}
+                {this.props.auth.isAuthen === false ? authLinks: guestLinks}
               </div>
             </div>
           </div>
@@ -41,4 +42,9 @@ class Landing extends Component {
   }
 }
 
-export default Landing;
+const mapStateToProps = state => ({
+  auth: state.auth
+});
+
+export default connect(mapStateToProps)(Landing);
+
