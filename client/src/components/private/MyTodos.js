@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
-import {fetchTodos, addNewTodo, deleteTodo} from "./todoActions"
+import { connect } from 'react-redux';
+import TodoCells from './TodoCells'
+import {fetchTodos, addNewTodo, deleteTodo} from './axiosRequests/todos'
+import {logoutUser} from '../../actions/authActionCreators'
+import {isTokenExpired} from '../../utils/validateToken';
 
   //1) For a better client side performance we set the state twice, before and after
   //   sending actions to DB to get rid of the DB delay between request and response 
@@ -9,51 +13,35 @@ class MyTodos extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      isAuthen: this.props.isAuthen, // passed from the app level state
       text:"",
       todos : []
     }
     this.onChange                             = this.onChange.bind(this)
     this.onDeleteSubmit                       = this.onDeleteSubmit.bind(this)
     this.onAddSubmit                          = this.onAddSubmit.bind(this)
-    this.setStateWithTodosFromInputField      = this.setStateWithTodosFromInputField.bind(this)
-    this.replaceStateUnValidatedTodoWithDbOne = this.replaceStateUnValidatedTodoWithDbOne.bind(this)
   }
 
-  replaceStateUnValidatedTodoWithDbOne(DbTodo){
-    // Find the unval todo index by text
-    let allTodos = this.state.todos
-    const index = allTodos.findIndex( 
-      text => text == DbTodo[0]
-    )
-    // Replace it then Set state with validated one
-    allTodos[index] = DbTodo
-    this.setState({ 
-      todos: [...allTodos] 
-    })
-  }
-
-  setStateWithTodosFromInputField(){
-    // Temporarily set todos state with text only (no id)
-    const InputFieldTodo  = [ this.state.text]
-    this.setState({ 
-      text:"",
-      todos: [...this.state.todos, InputFieldTodo] 
-    })
-  }
-  
   onChange(e){
     this.setState({ [e.target.name]: e.target.value });
   }
   
   onAddSubmit(e){
     e.preventDefault();
-    // If text field is not empty
-    if(this.state.text){
+    if (this.state.text) {
+      // Temporarily set todos state with text only (no id)
       const unValTodo = { text: this.state.text }
-      this.setStateWithTodosFromInputField()
-        addNewTodo(unValTodo)
-        .then( TodoFromDb => this.replaceStateUnValidatedTodoWithDbOne(TodoFromDb)
+      const InputFieldTodo  = [ this.state.text]
+      this.setState({ text:"", todos: [...this.state.todos, InputFieldTodo] })
+      
+      addNewTodo(unValTodo)
+        .then( DbValidTodo => 
+          {// Find the unval todo index by text
+            let allTodos = this.state.todos
+            const index = allTodos.findIndex( text => text == DbValidTodo[0] )
+            // Replace it then Set state with validated one
+            allTodos[index] = DbValidTodo
+            this.setState({ todos: [...allTodos] })
+          }
         )
     }
   }
@@ -67,49 +55,35 @@ class MyTodos extends Component {
     const todos = this.state.todos
     // New todos array without the todo we removed
     todos.splice(index,1)
-    deleteTodo(id).then(
-      this.setState( {todos: todos } )
-    )    
-  }
-  
-  componentWillMount(){
-    // Fetch user's todos then set State if valid
-    this.props.isAuthen && !this.props.isTokenExpired() ?
-      fetchTodos()
-        .then( todos => 
-          this.setState({ todos: todos })
-      ):this.props.logoutUser()
+    deleteTodo(id)
+      .then(this.setState( {todos: todos } ))    
   }
 
-  componentWillUpdate(){
-    if (this.props.isTokenExpired()){
+  componentWillMount(){
+    // Fetch user's todos then set State
+    if(this.props.auth.isAuthen && !isTokenExpired(this.props.auth.tokenData)){
+      fetchTodos()
+        .then( todos => this.setState({ todos: todos }))
+    } else {
       this.props.logoutUser()
+      this.props.history.push('/')
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
+    if (!nextProps.auth.isAuthen){
+      this.props.history.push('/')
+    }
+  }
+  
+  componentWillUpdate(){
+    if (isTokenExpired(this.props.auth.tokenData)){
+      this.props.logoutUser()
+      this.props.history.push('/')
     }
   }
 
   render() {
-    const renderTodoCells = (
-      this.state.todos.map((todo, index)=>{
-        let todoText = todo[0]
-        let todoId   = todo[1]
-        return (
-          <tr key={ Math.ceil(Math.random()*10000000) } >
-            <td> 
-              { index + 1 } 
-            </td>
-            <td> 
-              { todoText } 
-            </td>
-            <td>
-              <button type="button" value={index + "," + todoId}  className="btn btn-danger" onClick={this.onDeleteSubmit} style={{fontSize:"12px",padding:"0" ,height:"20px", width:"20px"}}>
-                &#x2718; 
-              </button> 
-            </td>
-          </tr>
-        )
-      })
-    )
-  
     return (
       <div>
         <form onSubmit={this.onAddSubmit} >
@@ -122,7 +96,10 @@ class MyTodos extends Component {
               </tr>
             </thead>
             <tbody>
-              {this.props.isAuthen ? renderTodoCells:<h1>sdfsdf</h1>}
+              <TodoCells 
+                todos={this.state.todos} 
+                onDeleteSubmit={this.onDeleteSubmit}
+              />
               <tr className="bg-info" >
                 <td></td>
                 <td >
@@ -147,4 +124,9 @@ class MyTodos extends Component {
   }
 }
 
-export default MyTodos
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+export default connect(mapStateToProps,{logoutUser})(MyTodos);

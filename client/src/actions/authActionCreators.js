@@ -11,9 +11,6 @@ export const registerUser = (userData) => dispatch => {
         .then( res => 
           handleToken(res.data.token, dispatch) 
         )
-        .catch( err => 
-          dispatch(setErrors(err.response.data))
-        )
     )
     .catch( err => 
       dispatch(setErrors(err.response.data))
@@ -42,6 +39,8 @@ function handleToken(token, dispatch) {
   const decoded = jwt_decode(token);
   // Set token in localStorage
   localStorage.setItem('token', token);
+  // Set Authorization Header
+  axios.defaults.headers.common['Authorization'] = token
   // Set token in store
   dispatch( setToken(decoded) )
 }

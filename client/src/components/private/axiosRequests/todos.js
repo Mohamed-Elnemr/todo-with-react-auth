@@ -4,9 +4,9 @@ export const fetchTodos = ()=>{
   return axios
     .get("/api/todos/")
     .then( (res)=>{
-        const todos = res.data.map((todo)=>{
-          return [todo.text, todo._id]
-        })
+        const todos = res.data.map(
+          (todo) => [todo.text, todo._id]
+        )
         return todos
     })
     .catch( err => console.log(err))
